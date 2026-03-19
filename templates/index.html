@@ -1,39 +1,211 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Disaster Prediction System</title>
+    <meta charset="UTF-8">
+    <title>AI Disaster Monitoring</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #cbd5f5;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+        }
+
+        input {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        button {
+            margin-top: 10px;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .score-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .score {
+            background: rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .risk-bar {
+            height: 12px;
+            border-radius: 10px;
+            background: #334155;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .risk-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #facc15, #ef4444);
+        }
+
+        .news {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .news p {
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .low { background: #22c55e; }
+        .medium { background: #facc15; color: black; }
+        .high { background: #ef4444; }
+
+    </style>
 </head>
-<body style="font-family:Arial; background:#0b1623; color:white;">
 
-<h1>AI Disaster Monitoring System</h1>
+<body>
 
-<form action="/predict" method="post" enctype="multipart/form-data">
-    <label>City:</label><br>
-    <input type="text" name="city" required><br><br>
+<div class="container">
+    <div class="card">
+        <h1>🌍 AI Disaster Monitoring</h1>
 
-    <label>Upload Satellite Image:</label><br>
-    <input type="file" name="image" required><br><br>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>City</label>
+                <input type="text" name="city" placeholder="Enter city..." required>
+            </div>
 
-    <button type="submit">Analyze Risk</button>
-</form>
+            <div class="form-group">
+                <label>Upload Satellite Image</label>
+                <input type="file" name="image">
+            </div>
 
-{% if result %}
+            <button type="submit">Analyze Risk</button>
+        </form>
 
-<hr>
+        {% if result %}
+        <div class="results">
+            <h2>Results for {{ result.city }}</h2>
 
-<h2>Results for {{city}}</h2>
+            <div class="score-box">
+                <div class="score">
+                    Weather
+                    <h3>{{ result.weather_score }}</h3>
+                </div>
 
-<p><b>Weather Score:</b> {{weather}}</p>
-<p><b>Satellite Score:</b> {{cnn}}</p>
-<p><b>Social Score:</b> {{nlp}}</p>
+                <div class="score">
+                    Satellite
+                    <h3>{{ result.satellite_score }}</h3>
+                </div>
 
-<h3>Final Risk: {{final}}</h3>
-<h3>Risk Level: {{level}}</h3>
+                <div class="score">
+                    Social
+                    <h3>{{ result.social_score }}</h3>
+                </div>
+            </div>
 
-<h4>Live News Signals:</h4>
-<p>{{news}}</p>
+            <h3 style="margin-top:20px;">Final Risk: {{ result.final_risk }}</h3>
 
-{% endif %}
+            <div class="risk-bar">
+                <div class="risk-fill" style="width: {{ result.final_risk * 100 }}%"></div>
+            </div>
+
+            <div class="badge {{ result.risk_level|lower }}">
+                {{ result.risk_level }} Risk
+            </div>
+
+            <div class="news">
+                <h3 style="margin-top:15px;">📰 Live Signals</h3>
+                {% for n in result.news %}
+                    <p>• {{ n }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
 
 </body>
 </html>
