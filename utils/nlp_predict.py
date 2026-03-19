@@ -1,4 +1,7 @@
 import nltk
+
+nltk.download('punkt')
+nltk.download('stopwords')
 from nltk.sentiment import SentimentIntensityAnalyzer
 
 nltk.download('vader_lexicon', quiet=True)
