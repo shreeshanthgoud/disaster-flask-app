@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disaster Prediction System</title>
+</head>
+<body style="font-family:Arial; background:#0b1623; color:white;">
+
+<h1>AI Disaster Monitoring System</h1>
+
+<form action="/predict" method="post" enctype="multipart/form-data">
+    <label>City:</label><br>
+    <input type="text" name="city" required><br><br>
+
+    <label>Upload Satellite Image:</label><br>
+    <input type="file" name="image" required><br><br>
+
+    <button type="submit">Analyze Risk</button>
+</form>
+
+{% if result %}
+
+<hr>
+
+<h2>Results for {{city}}</h2>
+
+<p><b>Weather Score:</b> {{weather}}</p>
+<p><b>Satellite Score:</b> {{cnn}}</p>
+<p><b>Social Score:</b> {{nlp}}</p>
+
+<h3>Final Risk: {{final}}</h3>
+<h3>Risk Level: {{level}}</h3>
+
+<h4>Live News Signals:</h4>
+<p>{{news}}</p>
+
+{% endif %}
+
+</body>
+</html>
