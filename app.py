@@ -12,8 +12,17 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@app.route("/")
-def home():
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        city = request.form.get("city")
+        image = request.files.get("image")
+
+        # your existing logic
+        result = process(city, image)  # or whatever your function is
+
+        return render_template("index.html", result=result)
+
     return render_template("index.html")
 
 
