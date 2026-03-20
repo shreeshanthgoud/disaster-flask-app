@@ -12,53 +12,57 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        city = request.form.get("city")
-        image = request.files.get("image")
 
-        # your existing logic
-        result = process(city, image)  # or whatever your function is
-
-        return render_template("index.html", result=result)
-
-    return render_template("index.html")
+@app.route("/", methods=["GET"])
+def home():
+    return render_template("index.html", result=None)
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    city = request.form["city"]
+    try:
+        city = request.form.get("city")
+        file = request.files.get("image")
 
-    # file upload
-    file = request.files["image"]
-    image_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(image_path)
+        # validation (like streamlit)
+        if not city:
+            return render_template("index.html", result=None, error="Enter city")
 
-    # get live news
-    news_text, keyword_score = build_social_text(city)
+        if not file or file.filename == "":
+            return render_template("index.html", result=None, error="Upload image")
 
-    # run models
-    weather = automatic_weather_risk(city)
-    cnn = predict_cnn_risk(image_path)
-    nlp = predict_text_risk(news_text)
+        # save image
+        image_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(image_path)
 
-    final, w1, w2, w3 = fuse_risk(weather, cnn, nlp)
-    level = risk_level(final)
+        # get social/news signals
+        news_text, _ = build_social_text(city)
 
-    return render_template(
-        "index.html",
-        result=True,
-        city=city,
-        weather=round(weather, 3),
-        cnn=round(cnn, 3),
-        nlp=round(nlp, 3),
-        final=round(final, 3),
-        level=level,
-        news=news_text[:300]
-    )
+        # model predictions
+        weather = automatic_weather_risk(city)
+        cnn = predict_cnn_risk(image_path)
+        nlp = predict_text_risk(news_text)
+
+        final, w1, w2, w3 = fuse_risk(weather, cnn, nlp)
+        level = risk_level(final)
+
+        result = {
+            "city": city,
+            "weather": round(weather, 3),
+            "cnn": round(cnn, 3),
+            "nlp": round(nlp, 3),
+            "final": round(final, 3),
+            "level": level,
+            "news": news_text.split(".")[:5]
+        }
+
+        return render_template("index.html", result=result)
+
+    except Exception as e:
+        print("ERROR:", e)
+        return render_template("index.html", result=None, error=str(e))
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
