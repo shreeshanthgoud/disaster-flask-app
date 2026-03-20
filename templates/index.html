@@ -1,210 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>AI Disaster Monitoring</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>AI Disaster Monitoring</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #0b1623;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+}
 
-        body {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+.container {
+    width: 100%;
+    max-width: 900px;
+}
 
-        .container {
-            width: 100%;
-            max-width: 900px;
-        }
+.card {
+    background: #111c2e;
+    padding: 25px;
+    border-radius: 15px;
+}
 
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: none;
+}
 
-        h1 {
-            text-align: center;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
+button {
+    background: #3b82f6;
+    color: white;
+    cursor: pointer;
+}
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+.results {
+    margin-top: 25px;
+}
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: #cbd5f5;
-        }
+.score-box {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
 
-        input, button {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            outline: none;
-        }
+.score {
+    flex: 1;
+    background: #1e293b;
+    padding: 15px;
+    text-align: center;
+    border-radius: 10px;
+}
 
-        input {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
+.bar {
+    height: 10px;
+    background: #333;
+    margin-top: 10px;
+}
 
-        input::placeholder {
-            color: #94a3b8;
-        }
+.fill {
+    height: 100%;
+    background: red;
+}
 
-        button {
-            margin-top: 10px;
-            background: linear-gradient(90deg, #3b82f6, #06b6d4);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+.badge {
+    margin-top: 10px;
+    padding: 5px 10px;
+    display: inline-block;
+    border-radius: 5px;
+}
 
-        button:hover {
-            transform: scale(1.05);
-        }
+.low {background: green;}
+.medium {background: orange;}
+.high {background: red;}
 
-        .results {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .score-box {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .score {
-            background: rgba(255,255,255,0.08);
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .risk-bar {
-            height: 12px;
-            border-radius: 10px;
-            background: #334155;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .risk-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #22c55e, #facc15, #ef4444);
-        }
-
-        .news {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #e2e8f0;
-        }
-
-        .news p {
-            margin-bottom: 8px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        .low { background: #22c55e; }
-        .medium { background: #facc15; color: black; }
-        .high { background: #ef4444; }
-
-    </style>
+.error {
+    color: red;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
-    <div class="card">
-        <h1>🌍 AI Disaster Monitoring</h1>
+<div class="card">
 
-        <form method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>City</label>
-                <input type="text" name="city" placeholder="Enter city..." required>
-            </div>
+<h2>🌍 AI Disaster Monitoring</h2>
 
-            <div class="form-group">
-                <label>Upload Satellite Image</label>
-                <input type="file" name="image">
-            </div>
+<form method="POST" action="/predict" enctype="multipart/form-data">
 
-            <button type="submit">Analyze Risk</button>
-        </form>
+<input type="text" name="city" placeholder="Enter city" required>
 
-        {% if result %}
-        <div class="results">
-            <h2>Results for {{ result.city }}</h2>
+<input type="file" name="image" required>
 
-            <div class="score-box">
-                <div class="score">
-                    Weather
-                    <h3>{{ result.weather_score }}</h3>
-                </div>
+<button type="submit">Analyze Risk</button>
 
-                <div class="score">
-                    Satellite
-                    <h3>{{ result.satellite_score }}</h3>
-                </div>
+</form>
 
-                <div class="score">
-                    Social
-                    <h3>{{ result.social_score }}</h3>
-                </div>
-            </div>
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
 
-            <h3 style="margin-top:20px;">Final Risk: {{ result.final_risk }}</h3>
+{% if result %}
+<div class="results">
 
-            <div class="risk-bar">
-                <div class="risk-fill" style="width: {{ result.final_risk * 100 }}%"></div>
-            </div>
+<h3>Results for {{ result.city }}</h3>
 
-            <div class="badge {{ result.risk_level|lower }}">
-                {{ result.risk_level }} Risk
-            </div>
+<div class="score-box">
+<div class="score">Weather<br>{{ result.weather }}</div>
+<div class="score">Satellite<br>{{ result.cnn }}</div>
+<div class="score">Social<br>{{ result.nlp }}</div>
+</div>
 
-            <div class="news">
-                <h3 style="margin-top:15px;">📰 Live Signals</h3>
-                {% for n in result.news %}
-                    <p>• {{ n }}</p>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
+<h3>Final Risk: {{ result.final }}</h3>
 
-    </div>
+<div class="bar">
+<div class="fill" style="width: {{ result.final * 100 }}%"></div>
+</div>
+
+<div class="badge {{ result.level|lower }}">
+{{ result.level }} Risk
+</div>
+
+<h4>Live Signals</h4>
+{% for n in result.news %}
+<p>• {{ n }}</p>
+{% endfor %}
+
+</div>
+{% endif %}
+
+</div>
 </div>
 
 </body>
